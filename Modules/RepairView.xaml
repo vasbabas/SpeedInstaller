@@ -1,0 +1,74 @@
+<UserControl x:Class="WDOS.Modules.RepairView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Title -->
+            <RowDefinition Height="Auto" />
+            <!-- Progress Bar -->
+            <RowDefinition Height="Auto" />
+            <!-- Repair Actions -->
+            <RowDefinition Height="Auto" />
+            <!-- Terminal Output -->
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Title -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,15">
+            <TextBlock Text="Sistem Onarım &amp; Bakım Modülü" FontSize="22" FontWeight="Bold" Foreground="{StaticResource AccentBlue}" />
+            <TextBlock Text="Temel Windows sistem bütünlüğünü denetler, bozuk dosyaları onarır ve ağ ayarlarını sıfırlar." FontSize="13" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,0" />
+        </StackPanel>
+
+        <!-- Progress Indicator -->
+        <Border Grid.Row="1" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderSlate}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,15">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="TxtProgressStatus" Text="İşlem Durumu: Bekleniyor..." FontStyle="Italic" Foreground="{StaticResource TextSecondary}" />
+                    <TextBlock x:Name="TxtProgressPercent" Grid.Column="1" Text="%0" FontWeight="Bold" Foreground="{StaticResource AccentBlue}" />
+                </Grid>
+                <ProgressBar x:Name="BarProgress" Height="14" Minimum="0" Maximum="100" Value="0" Background="#0F172A" Foreground="{StaticResource AccentBlue}" BorderThickness="0" Margin="0,8,0,0" />
+            </StackPanel>
+        </Border>
+
+        <!-- Buttons Grid -->
+        <Border Grid.Row="2" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderSlate}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="BtnSfc" Grid.Column="0" Content="SFC Scannow" Style="{StaticResource ModernButtonStyle}" Margin="0,0,8,0" Height="40" Click="BtnSfc_Click" />
+                <Button x:Name="BtnDism" Grid.Column="1" Content="DISM Restore" Style="{StaticResource ModernButtonStyle}" Margin="0,0,8,0" Height="40" Click="BtnDism_Click" />
+                <Button x:Name="BtnNetReset" Grid.Column="2" Content="Ağ Sıfırlama" Style="{StaticResource ModernButtonStyle}" Margin="0,0,8,0" Height="40" Click="BtnNetReset_Click" />
+                <Button x:Name="BtnDnsFlush" Grid.Column="3" Content="DNS Temizle" Style="{StaticResource ModernButtonStyle}" Height="40" Click="BtnDnsFlush_Click" />
+            </Grid>
+        </Border>
+
+        <!-- Terminal console -->
+        <Border Grid.Row="3" Background="#020617" BorderBrush="{StaticResource BorderSlate}" BorderThickness="1" CornerRadius="8" Padding="10">
+            <ScrollViewer x:Name="ScrollerLogs" VerticalScrollBarVisibility="Auto">
+                <TextBox x:Name="TxtLogs" 
+                         Background="Transparent" 
+                         Foreground="{StaticResource AccentGreen}" 
+                         FontFamily="{StaticResource Monospace}" 
+                         FontSize="12" 
+                         BorderThickness="0" 
+                         IsReadOnly="True" 
+                         TextWrapping="Wrap" 
+                         AcceptsReturn="True" 
+                         Text="[WDOS Onarım Modülü] Çalıştırmak istediğiniz işlemi yukarıdaki butonlardan seçin.&#x0a;Uarı: SFC ve DISM işlemleri birkaç dakika sürebilir.&#x0a;" />
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

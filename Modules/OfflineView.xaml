@@ -1,0 +1,163 @@
+<UserControl x:Class="WDOS.Modules.OfflineView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="550" d:DesignWidth="850">
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Title Section -->
+            <RowDefinition Height="Auto" />
+            <!-- Options & Installers Split -->
+            <RowDefinition Height="*" />
+            <!-- Action Button Section -->
+            <RowDefinition Height="Auto" />
+            <!-- Logs View Terminal -->
+            <RowDefinition Height="160" />
+        </Grid.RowDefinitions>
+
+        <!-- Title -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,15">
+            <TextBlock Text="Çevrimdışı Hızlı Dağıtım (Offline)" FontSize="22" FontWeight="Bold" Foreground="{StaticResource AccentBlue}" />
+            <TextBlock Text="İnternet bağlantısı olmadan yerel program kurulumlarını gerçekleştirir ve en yüksek performans optimizasyonlarını uygular." FontSize="13" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,0" />
+        </StackPanel>
+
+        <!-- Main Body Details -->
+        <Grid Grid.Row="1" Margin="0,5,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Column 1: Local Apps Checklist -->
+            <Border Grid.Column="0" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderSlate}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,10,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Kurulacak Yerel Uygulamalar" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,10" />
+                        <TextBlock Text="Uygulama yükleyicilerini uygulamanın yanındaki 'Installers' klasöründe bulundurun." FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,15" TextWrapping="Wrap" />
+
+                        <!-- App Checkboxes -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="ChkChrome" Content="Google Chrome" IsChecked="True" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TxtStatusChrome" Grid.Column="1" Text="Kontrol ediliyor..." FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="ChkAdobe" Content="Adobe Acrobat Reader" IsChecked="True" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TxtStatusAdobe" Grid.Column="1" Text="Kontrol ediliyor..." FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="ChkWinRar" Content="WinRAR" IsChecked="True" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TxtStatusWinRar" Grid.Column="1" Text="Kontrol ediliyor..." FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Added Alpemix -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="ChkAlpemix" Content="Alpemix" IsChecked="True" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TxtStatusAlpemix" Grid.Column="1" Text="Kontrol ediliyor..." FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Added AnyDesk -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="ChkAnyDesk" Content="AnyDesk" IsChecked="True" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TxtStatusAnyDesk" Grid.Column="1" Text="Kontrol ediliyor..." FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Added VLC Media Player -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="ChkVlc" Content="VLC Media Player" IsChecked="True" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TxtStatusVlc" Grid.Column="1" Text="Kontrol ediliyor..." FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Added 7-Zip -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="Chk7Zip" Content="7-Zip" IsChecked="True" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TxtStatus7Zip" Grid.Column="1" Text="Kontrol ediliyor..." FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                        </Grid>
+                        
+                        <Button Content="Kurulum Klasörünü Aç" Margin="0,15,0,0" Style="{StaticResource ModernButtonStyle}" Background="#334155" Padding="10,6,10,6" Click="OpenInstallersFolder_Click" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Column 2: System Performance Optimizations -->
+            <Border Grid.Column="1" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderSlate}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="10,0,0,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Performans ve Güç İyileştirmeleri" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,15" />
+
+                        <!-- Optimization Checkboxes -->
+                        <CheckBox x:Name="ChkTweakPower" Content="Yüksek Performans &amp; Uykuyu Kapat" IsChecked="True" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8" />
+                        <TextBlock Text="Güç profilini Yüksek Performans yapar ve ekran/uyku zamanlayıcılarını kapatır." FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="20,0,0,12" TextWrapping="Wrap" />
+
+                        <CheckBox x:Name="ChkTweakVisual" Content="Görsel Efektleri Optimize Et (Yazı Tipi Hariç)" IsChecked="True" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8" />
+                        <TextBlock Text="Tüm animasyonları kapatır. Okunabilirlik için ClearType kenar yumuşatmayı açık tutar." FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="20,0,0,12" TextWrapping="Wrap" />
+
+                        <CheckBox x:Name="ChkTweakPrivacy" Content="Gizlilik &amp; Telemetri Kapat (Debloat)" IsChecked="True" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8" />
+                        <TextBlock Text="Windows telemetri veri gönderimini, reklam kimliğini ve Bing başlat aramalarını engeller." FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="20,0,0,12" TextWrapping="Wrap" />
+
+                        <CheckBox x:Name="ChkTweakSystem" Content="Sistem Servis &amp; Dosya Optimizasyonu" IsChecked="True" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8" />
+                        <TextBlock Text="NTFS son erişim yazmalarını kapatır, RemoteRegistry ve Update P2P paylaşımı devre dışı bırakır." FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="20,0,0,12" TextWrapping="Wrap" />
+
+                        <CheckBox x:Name="ChkTweakAdvanced" Content="İleri Düzey Hızlandırma &amp; Gecikme Tweaks" IsChecked="True" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8" />
+                        <TextBlock Text="Xbox GameDVR veri takibini kapatır, MenuShowDelay hızlandırır ve çekirdeği RAM'de kilitler." FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="20,0,0,12" TextWrapping="Wrap" />
+
+                        <CheckBox x:Name="ChkCleanup" Content="Gereksiz Dosyaları Temizle (Temp/Prefetch)" IsChecked="True" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8" />
+                        <TextBlock Text="Kullanıcı ve Sistem Temp klasörleri ile Prefetch dosyalarını güvenli şekilde boşaltır." FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="20,0,0,0" TextWrapping="Wrap" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Start Button -->
+        <Grid Grid.Row="2" Margin="0,0,0,15">
+            <Button x:Name="BtnStartDeploy" Content="⚡ TEK TIKLA DAĞITIMI VE OPTİMİZASYONU BAŞLAT" Height="45" Style="{StaticResource ModernButtonStyle}" FontSize="14" Click="BtnStartDeploy_Click" />
+        </Grid>
+
+        <!-- Log Box -->
+        <Border Grid.Row="3" Background="#020617" BorderBrush="{StaticResource BorderSlate}" BorderThickness="1" CornerRadius="8" Padding="10">
+            <ScrollViewer x:Name="ScrollerLogs" VerticalScrollBarVisibility="Auto">
+                <TextBox x:Name="TxtLogs" 
+                         Background="Transparent" 
+                         Foreground="{StaticResource AccentGreen}" 
+                         FontFamily="{StaticResource Monospace}" 
+                         FontSize="12" 
+                         BorderThickness="0" 
+                         IsReadOnly="True" 
+                         TextWrapping="Wrap" 
+                         AcceptsReturn="True" 
+                         Text="[WDOS Offline Dağıtım Modülü] Başlamak için yukarıdaki butona tıklayın.&#x0a;" />
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

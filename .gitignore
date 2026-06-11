@@ -1,27 +1,16 @@
-# Build and Output Directories
+# Build folders
 bin/
 obj/
-[Dd]ebug/
-[Rr]elease/
-x64/
-x86/
-
-# IDE and Project Specific Files
-.vs/
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
-*.userprefs
-.idea/
 
 # User-specific files
-*.rsuser
-*.suo
 *.user
 *.userosscache
 *.sln.docstates
 
-# OS-specific files
-.DS_Store
-Thumbs.db
+# Visual Studio cache and settings
+.vs/
+
+# Programlar installers (to avoid uploading large setup files to GitHub)
+Programlar/chrome_installer.exe
+Programlar/adobe_reader.exe
+Programlar/alpemix.exe

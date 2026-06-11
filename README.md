@@ -29,18 +29,25 @@ Windows arayüzündeki gereksiz yükleri kaldırarak performansı maksimuma çı
 ### 5. 🔔 Modern Başarı Bildirimi
 * İşlemler bittiğinde sesli uyarı verir ve özel tasarlanmış modern, karanlık temalı bir pop-up bildirim penceresi gösterir.
 
+## 📥 İndirme Seçenekleri (Downloads)
+
+İhtiyacınıza göre aşağıdaki paketlerden birini indirebilirsiniz:
+* 📥 **[SpeedInstaller_Full.zip (Tam Paket - ~990 MB)](https://github.com/vasbabas/SpeedInstaller/releases/download/v1.0.0/SpeedInstaller_Full.zip) [Önerilen]:** Tüm güncel program yükleyicileri (`Chrome`, `Adobe Reader`, `Alpemix`) klasör yapısıyla birlikte **hazır eklenmiş** durumdadır. İndirip klasöre çıkardıktan sonra doğrudan çalıştırabilirsiniz.
+* 📥 **[SpeedInstaller.zip (Hafif Paket - ~150 KB)](https://github.com/vasbabas/SpeedInstaller/releases/download/v1.0.0/SpeedInstaller.zip):** Sadece çalıştırılabilir `.exe` dosyasını ve boş klasör yapısını içerir. Kurulmasını istediğiniz `.exe` program yükleyicilerini `Programlar` klasörüne kendiniz manuel olarak eklemelisiniz.
+
 ---
 
 ## 🛠️ Nasıl Kullanılır?
 
-1. **[SpeedInstaller.exe](SpeedInstaller.exe)** dosyasını indirin.
-2. Executable dosyasının bulunduğu dizinde **`Programlar`** adında bir klasör açın.
-3. Klasörün içerisine çevrimdışı yükleyicileri yerleştirin:
-   * `chrome_installer.exe`
-   * `adobe_reader.exe`
-   * `alpemix.exe`
-4. `SpeedInstaller.exe` dosyasını **Yönetici Olarak Çalıştırın** (Uygulama zaten yetki isteyecektir).
-5. Kurulum ve optimizasyon otomatik başlayacaktır. Bittiğinde başarı ekranı görünecektir.
+### Tam Paket İçin:
+1. `SpeedInstaller_Full.zip` dosyasını indirin ve bir klasöre çıkartın.
+2. `SpeedInstaller.exe` dosyasını **Sağ Tıklayıp Yönetici Olarak Çalıştırın**.
+3. Tüm kurulum ve optimizasyon işlemleri otomatik olarak terminal ekranında tamamlanacaktır.
+
+### Hafif Paket İçin:
+1. `SpeedInstaller.zip` dosyasını indirin ve bir klasöre çıkartın.
+2. Açılan `Programlar` klasörünün içerisine kurmak istediğiniz `.exe` formatındaki yükleyicileri yerleştirin (Program isimlerinde `chrome`, `adobe`/`reader`/`acro`, `alpemix` anahtar kelimelerinin bulunması yeterlidir).
+3. `SpeedInstaller.exe` dosyasını **Sağ Tıklayıp Yönetici Olarak Çalıştırın**.
 
 ---
 

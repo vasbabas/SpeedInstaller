@@ -27,9 +27,16 @@ namespace SpeedInstaller
         private const uint WM_SETTINGCHANGE = 0x001A;
         private const uint SMTO_ABORTIFHUNG = 0x0002;
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool AllocConsole();
+
         [STAThread]
         static void Main()
         {
+            // Allocate a console window to ensure it is visible even when run from GUI
+            AllocConsole();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -83,13 +90,25 @@ namespace SpeedInstaller
                 System.Media.SystemSounds.Asterisk.Play();
                 Console.Beep(800, 300);
 
+                // Open the modern visual success form
                 Application.Run(new NotificationForm());
+
+                // Keep the console open so the user can read the logs
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("[i] Cikis yapmak icin herhangi bir tusa basin...");
+                Console.ResetColor();
+                Console.ReadKey();
             }
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"[!] Bir hata olustu: {ex.Message}");
                 Console.ResetColor();
+                
+                Console.WriteLine("\n[i] Kapatmak icin herhangi bir tusa basin...");
+                Console.ReadKey();
+
                 MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

@@ -10,7 +10,5 @@ obj/
 # Visual Studio cache and settings
 .vs/
 
-# Programlar installers (to avoid uploading large setup files to GitHub)
-Programlar/chrome_installer.exe
-Programlar/adobe_reader.exe
-Programlar/alpemix.exe
+# Ignore all installers in the Programlar folder
+Programlar/

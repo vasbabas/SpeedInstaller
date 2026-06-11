@@ -33,21 +33,53 @@ namespace SpeedInstaller
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            Console.Title = "SpeedInstaller & Optimizer";
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("=====================================================================");
+            Console.WriteLine("                SPEEDINSTALLER & WINDOWS OPTIMIZER                   ");
+            Console.WriteLine("=====================================================================");
+            Console.ResetColor();
+            Console.WriteLine();
+
             try
             {
                 // 1. RUN PROGRAM INSTALLERS
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("[*] Program kurulumlari baslatiliyor...");
+                Console.ResetColor();
                 RunInstallers();
+                Console.WriteLine("[+] Program kurulum adimlari tamamlandi.");
+                Console.WriteLine();
 
                 // 2. APPLY VISUAL & PERFORMANCE SETTINGS
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("[*] Görsel ve performans ayarlari optimize ediliyor...");
+                Console.ResetColor();
                 ApplyPerformanceSettings();
+                Console.WriteLine("[+] Tüm görsel efektler kapatildi (En iyi performans modu aktif).");
+                Console.WriteLine("[+] ClearType yazı tipi düzeltme açik birakildi.");
+                Console.WriteLine();
 
                 // 3. APPLY POWER & SLEEP SETTINGS
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("[*] Güç ve uyku ayarlari yapilandiriliyor...");
+                Console.ResetColor();
                 ApplyPowerSettings();
+                Console.WriteLine("[+] Güç plani 'Yüksek Performans' olarak ayarlandi.");
+                Console.WriteLine("[+] Ekran ve Uyku modu zaman aşimlari 'ASLA' olarak ayarlandi.");
+                Console.WriteLine();
 
                 // 4. RUN WINGET UPGRADES IF ONLINE
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("[*] Güncelleştirmeler kontrol ediliyor...");
+                Console.ResetColor();
                 UpgradePackagesUsingWinget();
+                Console.WriteLine();
 
                 // 5. BEEP AND NOTIFICATION POPUP
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("[+] TÜM İŞLEMLER BAŞARIYLA TAMAMLANDI!");
+                Console.ResetColor();
                 System.Media.SystemSounds.Asterisk.Play();
                 Console.Beep(800, 300);
 
@@ -55,8 +87,22 @@ namespace SpeedInstaller
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"[!] Bir hata olustu: {ex.Message}");
+                Console.ResetColor();
                 MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private static string? FindInstaller(string directory, string pattern)
+        {
+            try
+            {
+                string[] files = Directory.GetFiles(directory, pattern, SearchOption.TopDirectoryOnly);
+                if (files.Length > 0) return files[0];
+            }
+            catch {}
+            return null;
         }
 
         private static void RunInstallers()
@@ -66,29 +112,44 @@ namespace SpeedInstaller
 
             if (!Directory.Exists(programlarDir))
             {
-                // If directory does not exist, we just skip silently or create it
+                Console.WriteLine("[-] 'Programlar' klasörü bulunamadı. Dizin oluşturuluyor...");
                 Directory.CreateDirectory(programlarDir);
                 return;
             }
 
             // 1. Chrome Setup
-            string chromePath = Path.Combine(programlarDir, "chrome_installer.exe");
-            if (File.Exists(chromePath))
+            string? chromePath = FindInstaller(programlarDir, "*chrome*.exe");
+            if (chromePath != null)
             {
+                Console.WriteLine($"[*] Google Chrome kuruluyor ({Path.GetFileName(chromePath)}), lütfen bekleyin...");
                 RunProcess(chromePath, "/silent /install");
+                Console.WriteLine("[+] Google Chrome kurulum işlemi tamamlandı.");
+            }
+            else
+            {
+                Console.WriteLine("[-] Google Chrome kurulum dosyası (*chrome*.exe) bulunamadı, bu adım atlanıyor.");
             }
 
             // 2. Adobe Reader Setup
-            string adobePath = Path.Combine(programlarDir, "adobe_reader.exe");
-            if (File.Exists(adobePath))
+            string? adobePath = FindInstaller(programlarDir, "*adobe*.exe") ?? 
+                                FindInstaller(programlarDir, "*reader*.exe") ?? 
+                                FindInstaller(programlarDir, "*acro*.exe");
+            if (adobePath != null)
             {
+                Console.WriteLine($"[*] Adobe Acrobat Reader kuruluyor ({Path.GetFileName(adobePath)}), lütfen bekleyin...");
                 RunProcess(adobePath, "/sAll /rs EULA_ACCEPT=YES");
+                Console.WriteLine("[+] Adobe Acrobat Reader kurulum işlemi tamamlandı.");
+            }
+            else
+            {
+                Console.WriteLine("[-] Adobe Reader kurulum dosyası (*adobe*, *reader*, *acro*) bulunamadı, bu adım atlanıyor.");
             }
 
             // 3. Alpemix Setup / Portable Move
-            string alpemixPath = Path.Combine(programlarDir, "alpemix.exe");
-            if (File.Exists(alpemixPath))
+            string? alpemixPath = FindInstaller(programlarDir, "*alpemix*.exe");
+            if (alpemixPath != null)
             {
+                Console.WriteLine($"[*] Alpemix kuruluyor/konumlandırılıyor ({Path.GetFileName(alpemixPath)}), lütfen bekleyin...");
                 // Run silent setup
                 RunProcess(alpemixPath, "/S");
 
@@ -120,11 +181,16 @@ namespace SpeedInstaller
                         CreateNoWindow = true,
                         UseShellExecute = false
                     })?.WaitForExit();
+                    Console.WriteLine("[+] Alpemix Program Files içerisine konumlandırıldı ve masaüstü kısayolu oluşturuldu.");
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Fail silently for portable copying (e.g. if file is locked or running)
+                    Console.WriteLine($"[-] Alpemix kısayol/kopyalama hatası: {ex.Message}");
                 }
+            }
+            else
+            {
+                Console.WriteLine("[-] Alpemix kurulum dosyası (*alpemix*.exe) bulunamadı, bu adım atlanıyor.");
             }
         }
 
@@ -246,24 +312,31 @@ namespace SpeedInstaller
 
         private static void UpgradePackagesUsingWinget()
         {
+            Console.WriteLine("[*] İnternet bağlantısı kontrol ediliyor...");
             if (IsInternetAvailable())
             {
+                Console.WriteLine("[+] İnternet bağlantısı aktif. Winget güncelleştirmeleri başlatılıyor...");
                 try
                 {
                     ProcessStartInfo psi = new ProcessStartInfo
                     {
                         FileName = "winget",
                         Arguments = "upgrade --all --silent --accept-source-agreements --accept-package-agreements",
-                        CreateNoWindow = true,
+                        CreateNoWindow = false, // Set to false to show winget output in cmd!
                         UseShellExecute = false
                     };
                     Process? p = Process.Start(psi);
                     p?.WaitForExit();
+                    Console.WriteLine("[+] Winget güncellemeleri tamamlandı.");
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("Winget upgrade error: " + ex.Message);
+                    Console.WriteLine($"[-] Winget çalıştırma hatası: {ex.Message}");
                 }
+            }
+            else
+            {
+                Console.WriteLine("[-] İnternet bağlantısı yok veya erişim zaman aşımına uğradı. Güncelleme adımı atlanıyor.");
             }
         }
 

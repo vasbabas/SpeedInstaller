@@ -32,8 +32,8 @@ Windows arayüzündeki gereksiz yükleri kaldırarak performansı maksimuma çı
 ## 📥 İndirme Seçenekleri (Downloads)
 
 İhtiyacınıza göre aşağıdaki paketlerden birini indirebilirsiniz:
-* 📥 **[SpeedInstaller_Full.zip (Tam Paket - ~990 MB)](https://github.com/vasbabas/SpeedInstaller/releases/download/v1.0.2/SpeedInstaller_Full.zip) [Önerilen]:** Tüm güncel program yükleyicileri (`Chrome`, `Adobe Reader`, `Alpemix`) klasör yapısıyla birlikte **hazır eklenmiş** durumdadır. İndirip klasöre çıkardıktan sonra doğrudan çalıştırabilirsiniz.
-* 📥 **[SpeedInstaller.zip (Hafif Paket - ~150 KB)](https://github.com/vasbabas/SpeedInstaller/releases/download/v1.0.2/SpeedInstaller.zip):** Sadece çalıştırılabilir `.exe` dosyasını ve boş klasör yapısını içerir. Kurulmasını istediğiniz `.exe` program yükleyicilerini `Programlar` klasörüne kendiniz manuel olarak eklemelisiniz.
+* 📥 **[SpeedInstaller_Full.zip (Tam Paket - ~990 MB)](https://github.com/vasbabas/SpeedInstaller/releases/download/v1.1.0/SpeedInstaller_Full.zip) [Önerilen]:** Tüm güncel program yükleyicileri (`Chrome`, `Adobe Reader`, `Alpemix`) klasör yapısıyla birlikte **hazır eklenmiş** durumdadır. İndirip klasöre çıkardıktan sonra doğrudan çalıştırabilirsiniz.
+* 📥 **[SpeedInstaller.zip (Hafif Paket - ~150 KB)](https://github.com/vasbabas/SpeedInstaller/releases/download/v1.1.0/SpeedInstaller.zip):** Sadece çalıştırılabilir `.exe` dosyasını ve boş klasör yapısını içerir. Kurulmasını istediğiniz `.exe` program yükleyicilerini `Programlar` klasörüne kendiniz manuel olarak eklemelisiniz.
 
 ---
 

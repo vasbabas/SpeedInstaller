@@ -12,3 +12,7 @@ obj/
 
 # Ignore all installers in the Programlar folder
 Programlar/
+
+# Ignore zip releases in the project root
+*.zip
+*.rar

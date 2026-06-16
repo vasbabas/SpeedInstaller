@@ -140,8 +140,8 @@ namespace SpeedInstaller
             string? chromePath = FindInstaller(programlarDir, "*chrome*.exe");
             if (chromePath != null)
             {
-                Console.WriteLine($"[*] Google Chrome kuruluyor ({Path.GetFileName(chromePath)}), lütfen bekleyin...");
-                RunProcess(chromePath, "/silent /install");
+                Console.WriteLine($"[*] Google Chrome kuruluyor ({Path.GetFileName(chromePath)})...");
+                RunProcess(chromePath, ""); // Remove silent flags to show installer GUI
                 Console.WriteLine("[+] Google Chrome kurulum işlemi tamamlandı.");
             }
             else
@@ -155,8 +155,8 @@ namespace SpeedInstaller
                                 FindInstaller(programlarDir, "*acro*.exe");
             if (adobePath != null)
             {
-                Console.WriteLine($"[*] Adobe Acrobat Reader kuruluyor ({Path.GetFileName(adobePath)}), lütfen bekleyin...");
-                RunProcess(adobePath, "/sAll /rs EULA_ACCEPT=YES");
+                Console.WriteLine($"[*] Adobe Acrobat Reader kuruluyor ({Path.GetFileName(adobePath)})...");
+                RunProcess(adobePath, ""); // Remove silent flags to show installer GUI
                 Console.WriteLine("[+] Adobe Acrobat Reader kurulum işlemi tamamlandı.");
             }
             else
@@ -168,9 +168,9 @@ namespace SpeedInstaller
             string? alpemixPath = FindInstaller(programlarDir, "*alpemix*.exe");
             if (alpemixPath != null)
             {
-                Console.WriteLine($"[*] Alpemix kuruluyor/konumlandırılıyor ({Path.GetFileName(alpemixPath)}), lütfen bekleyin...");
-                // Run silent setup
-                RunProcess(alpemixPath, "/S");
+                Console.WriteLine($"[*] Alpemix kuruluyor/konumlandırılıyor ({Path.GetFileName(alpemixPath)})...");
+                // Run normal setup
+                RunProcess(alpemixPath, ""); // Remove silent flag to show setup GUI
 
                 // Check or handle portable setup
                 try
@@ -317,7 +317,7 @@ namespace SpeedInstaller
                 {
                     FileName = "powercfg.exe",
                     Arguments = args,
-                    CreateNoWindow = true,
+                    CreateNoWindow = false, // Set to false to show execution output if any
                     UseShellExecute = false
                 };
                 Process? p = Process.Start(psi);
@@ -340,8 +340,8 @@ namespace SpeedInstaller
                     ProcessStartInfo psi = new ProcessStartInfo
                     {
                         FileName = "winget",
-                        Arguments = "upgrade --all --silent --accept-source-agreements --accept-package-agreements",
-                        CreateNoWindow = false, // Set to false to show winget output in cmd!
+                        Arguments = "upgrade --all --accept-source-agreements --accept-package-agreements", // Remove --silent to show update logs
+                        CreateNoWindow = false,
                         UseShellExecute = false
                     };
                     Process? p = Process.Start(psi);

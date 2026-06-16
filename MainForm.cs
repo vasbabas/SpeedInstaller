@@ -55,7 +55,7 @@ namespace SpeedInstaller
         private CheckBox chkClearType;
         private CheckBox chkPowerPlan;
         private CheckBox chkSleepTimeout;
-        private CheckBox chkVisualEffectBackup; // Unused but kept for reference
+        private CheckBox chkAdvancedTweaks;
         private CheckBox chkWingetUpgrade;
 
         private RichTextBox rchLogs;
@@ -160,7 +160,7 @@ namespace SpeedInstaller
 
             lblLeftTitle = new Label
             {
-                Text = "📦 PROGRAM KURUCU (Dinamik)",
+                Text = "📦 PROGRAM KURUCU (Otomatik Tespit)",
                 Font = new Font("Segoe UI", 11F, FontStyle.Bold),
                 ForeColor = Color.White,
                 Location = new Point(15, 15),
@@ -209,17 +209,19 @@ namespace SpeedInstaller
                 Size = new Size(340, 25)
             };
 
-            chkVisualEffects = CreateStyledCheckBox("Görsel Efektleri Kapat (En İyi Performans)", 50, true);
-            chkClearType = CreateStyledCheckBox("ClearType Yazı Düzeltmeyi Açık Bırak", 85, true);
-            chkPowerPlan = CreateStyledCheckBox("Güç Planını 'Yüksek Performans' Yap", 120, true);
-            chkSleepTimeout = CreateStyledCheckBox("Ekran Kapatma ve Uykuyu Devre Dışı Bırak", 155, true);
-            chkWingetUpgrade = CreateStyledCheckBox("Winget ile Otomatik Paketleri Güncelle", 190, true);
+            chkVisualEffects = CreateStyledCheckBox("Görsel Efektleri Kapat (Sadece ClearType)", 50, true);
+            chkClearType = CreateStyledCheckBox("ClearType Yazı Düzeltmeyi Açık Bırak", 80, true);
+            chkPowerPlan = CreateStyledCheckBox("Yüksek Performans Güç Planı + SSD Ayarı", 110, true);
+            chkSleepTimeout = CreateStyledCheckBox("Ekran Kapatma ve Uykuyu Devre Dışı Bırak", 140, true);
+            chkAdvancedTweaks = CreateStyledCheckBox("Gelişmiş Hızlandırma Ayarları (Menu/CPU/RAM)", 170, true);
+            chkWingetUpgrade = CreateStyledCheckBox("Winget ile Otomatik Paketleri Güncelle", 200, true);
 
             pnlRightTweak.Controls.Add(lblRightTitle);
             pnlRightTweak.Controls.Add(chkVisualEffects);
             pnlRightTweak.Controls.Add(chkClearType);
             pnlRightTweak.Controls.Add(chkPowerPlan);
             pnlRightTweak.Controls.Add(chkSleepTimeout);
+            pnlRightTweak.Controls.Add(chkAdvancedTweaks);
             pnlRightTweak.Controls.Add(chkWingetUpgrade);
 
             // Logging Terminal
@@ -291,6 +293,8 @@ namespace SpeedInstaller
 
             try
             {
+                HashSet<string> installedApps = GetInstalledApps();
+
                 if (Directory.Exists(programlarDir))
                 {
                     string[] exeFiles = Directory.GetFiles(programlarDir, "*.exe", SearchOption.TopDirectoryOnly);
@@ -306,16 +310,24 @@ namespace SpeedInstaller
                         foreach (string file in exeFiles)
                         {
                             string fileName = Path.GetFileName(file);
+                            
+                            // Check if program is already installed on system
+                            string matchedName = "";
+                            bool isInstalled = IsProgramInstalled(file, installedApps, out matchedName);
+
+                            string labelText = isInstalled ? $"{fileName} (Zaten Kurulu)" : fileName;
+                            Color labelColor = isInstalled ? Color.FromArgb(120, 180, 120) : Color.FromArgb(220, 220, 230);
+
                             CheckBox chk = new CheckBox
                             {
-                                Text = fileName,
+                                Text = labelText,
                                 Font = new Font("Segoe UI", 9.5F),
-                                ForeColor = Color.FromArgb(220, 220, 230),
+                                ForeColor = labelColor,
                                 AutoSize = true,
                                 Margin = new Padding(5, 5, 5, 5),
-                                Checked = true,
+                                Checked = !isInstalled, // Default unchecked if already installed
                                 FlatStyle = FlatStyle.Flat,
-                                Tag = file // Store full path
+                                Tag = new KeyValuePair<string, bool>(file, isInstalled) // Store path and install status
                             };
                             flowSoftwareList.Controls.Add(chk);
                             dynamicProgramCheckBoxes.Add(chk);
@@ -337,84 +349,170 @@ namespace SpeedInstaller
             prgProgress.Value = 0;
             rchLogs.Clear();
 
+            List<string> failedOperations = new List<string>();
+            List<string> alreadyInstalledList = new List<string>();
+
             Console.WriteLine("[*] Optimizasyon ve Kurulum Islemi Baslatildi...");
             Console.WriteLine("--------------------------------------------------");
 
-            try
+            // Gather installers
+            List<string> selectedInstallers = new List<string>();
+            foreach (var chk in dynamicProgramCheckBoxes)
             {
-                // Calculate steps
-                int totalSteps = 0;
-                List<string> selectedInstallers = new List<string>();
-                foreach (var chk in dynamicProgramCheckBoxes)
+                if (chk.Tag is KeyValuePair<string, bool> pair)
                 {
-                    if (chk.Checked && chk.Tag != null)
+                    if (chk.Checked)
                     {
-                        selectedInstallers.Add(chk.Tag.ToString()!);
+                        selectedInstallers.Add(pair.Key);
+                    }
+                    else if (pair.Value)
+                    {
+                        // Was unchecked because it was already installed
+                        alreadyInstalledList.Add(Path.GetFileName(pair.Key));
                     }
                 }
+            }
 
-                totalSteps += selectedInstallers.Count;
-                if (chkVisualEffects.Checked) totalSteps++;
-                if (chkPowerPlan.Checked) totalSteps++;
-                if (chkWingetUpgrade.Checked) totalSteps++;
+            int totalSteps = 0;
+            if (chkVisualEffects.Checked) totalSteps++;
+            if (chkAdvancedTweaks.Checked) totalSteps++;
+            if (chkPowerPlan.Checked) totalSteps++;
+            totalSteps += selectedInstallers.Count;
+            if (chkWingetUpgrade.Checked) totalSteps++;
 
-                int currentStep = 0;
-                Action incrementProgress = () =>
+            int currentStep = 0;
+            Action incrementProgress = () =>
+            {
+                currentStep++;
+                int val = (int)(((double)currentStep / totalSteps) * 100);
+                if (val > 100) val = 100;
+                this.Invoke((MethodInvoker)(() => prgProgress.Value = val));
+            };
+
+            try
+            {
+                // PHASE 1: PERFORMANCE TUNING (SYSTEM TWEAKS)
+                Console.WriteLine("[*] Aşama 1: Performans ve Sistem Ayarları Yapılandırılıyor...");
+                
+                if (chkVisualEffects.Checked)
                 {
-                    currentStep++;
-                    int val = (int)(((double)currentStep / totalSteps) * 100);
-                    if (val > 100) val = 100;
-                    this.Invoke((MethodInvoker)(() => prgProgress.Value = val));
-                };
+                    Console.WriteLine("[*] Görsel Efektler Kapatılıyor (Özel Performans Şablonu)...");
+                    bool ok = await Task.Run(() => ApplyPerformanceSettings(chkClearType.Checked));
+                    if (!ok) failedOperations.Add("Görsel Efekt Optimizasyonu");
+                    incrementProgress();
+                }
 
-                // 1. Run Dynamic Installers
+                if (chkAdvancedTweaks.Checked)
+                {
+                    Console.WriteLine("[*] Gelişmiş Hızlandırma Ayarları Uygulanıyor (Menu/CPU/AutoEndTasks)...");
+                    bool ok = await Task.Run(() => ApplyAdvancedTweaks());
+                    if (!ok) failedOperations.Add("Gelişmiş Performans Kayıt Defteri Ayarları");
+                    incrementProgress();
+                }
+
+                if (chkPowerPlan.Checked)
+                {
+                    Console.WriteLine("[*] Güç Yönetimi ve SSD Alan Tasarrufu Yapılandırılıyor...");
+                    bool ok = await Task.Run(() => ApplyPowerSettings(chkSleepTimeout.Checked));
+                    if (!ok) failedOperations.Add("Yüksek Performans Güç Şeması");
+                    incrementProgress();
+                }
+
+                Console.WriteLine("[+] Performans ve Sistem optimizasyon ayarları başarıyla tamamlandı.");
+                MessageBox.Show("Görsel ve performans ayarları başarıyla tamamlandı.\n\nŞimdi program kurulumlarına geçiliyor...", "Aşama 1 Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // PHASE 2: PROGRAM INSTALLATIONS
                 if (selectedInstallers.Count > 0)
                 {
-                    Console.WriteLine("[*] Seçilen Programların Kurulumu Başlatılıyor...");
+                    Console.WriteLine();
+                    Console.WriteLine("[*] Aşama 2: Seçilen Programların Kurulumu Başlatılıyor...");
                     foreach (string file in selectedInstallers)
                     {
                         string name = Path.GetFileName(file);
-                        Console.WriteLine($"[*] Yükleniyor (Arayüz görünür durumda): {name}...");
+                        Console.WriteLine($"[*] Yükleniyor (Arayüz görünür): {name}...");
                         
-                        await Task.Run(() => RunProcess(file, ""));
-                        Console.WriteLine($"[+] Kurulum penceresi açıldı/tamamlandı: {name}");
+                        bool ok = await Task.Run(() => RunProcess(file, ""));
+                        if (!ok) failedOperations.Add($"Program Kurulumu: {name}");
+                        Console.WriteLine($"[+] Kurulum işlemi tetiklendi: {name}");
                         incrementProgress();
                     }
+                    Console.WriteLine("[+] Seçilen programların kurulumları tamamlandı.");
+                    MessageBox.Show("Seçilen programların kurulumları tamamlandı.\n\nŞimdi güncelleştirmeler (winget) kontrol edilecek...", "Aşama 2 Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
-                // 2. Performance Tuning
-                if (chkVisualEffects.Checked)
-                {
-                    Console.WriteLine("[*] Görsel Performans Ayarları Yapılandırılıyor...");
-                    await Task.Run(() => ApplyPerformanceSettings(chkClearType.Checked));
-                    Console.WriteLine("[+] Görsel ayarlar optimize edildi.");
-                    incrementProgress();
-                }
-
-                // 3. Power settings
-                if (chkPowerPlan.Checked)
-                {
-                    Console.WriteLine("[*] Güç Yönetimi Yapılandırılıyor...");
-                    await Task.Run(() => ApplyPowerSettings(chkSleepTimeout.Checked));
-                    Console.WriteLine("[+] Güç planı ayarları tamamlandı.");
-                    incrementProgress();
-                }
-
-                // 4. Winget updates
+                // PHASE 3: WINGET UPGRADES
                 if (chkWingetUpgrade.Checked)
                 {
-                    Console.WriteLine("[*] Güncelleştirmeler denetleniyor...");
-                    await Task.Run(() => UpgradePackagesUsingWinget());
+                    Console.WriteLine();
+                    Console.WriteLine("[*] Aşama 3: Güncelleştirmeler Denetleniyor...");
+                    MessageBox.Show("Güncelleştirme kontrolü ve winget yükseltmeleri başlatılıyor...", "Aşama 3 Başlatılıyor", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    
+                    bool ok = await Task.Run(() => UpgradePackagesUsingWinget());
+                    if (!ok) failedOperations.Add("Winget Paket Güncelleme");
                     incrementProgress();
                 }
 
+                // FINISH SUMMARY
+                Console.WriteLine();
                 Console.WriteLine("--------------------------------------------------");
-                Console.WriteLine("[+] TÜM İŞLEMLER BAŞARIYLA TAMAMLANDI!");
+                Console.WriteLine("[+] TÜM İŞLEMLER TAMAMLANDI!");
                 System.Media.SystemSounds.Asterisk.Play();
 
-                // Show success dialog
-                var successForm = new NotificationForm();
-                successForm.ShowDialog(this);
+                if (alreadyInstalledList.Count > 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("[i] Zaten Kurulu Olduğu İçin Atlanan Programlar:");
+                    foreach (var app in alreadyInstalledList)
+                    {
+                        Console.WriteLine($"   ➔ {app}");
+                    }
+                    Console.ResetColor();
+                }
+
+                if (failedOperations.Count > 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("[!] Başarısız/Atlanan İşlemler Listesi:");
+                    foreach (var err in failedOperations)
+                    {
+                        Console.WriteLine($"   ➔ {err}");
+                    }
+                    Console.ResetColor();
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("İşlem tamamlandı, ancak bazı adımlarda hata oluştu veya atlandı:\n");
+                    foreach (var err in failedOperations)
+                    {
+                        sb.AppendLine($"• {err}");
+                    }
+                    if (alreadyInstalledList.Count > 0)
+                    {
+                        sb.AppendLine("\nZaten Kurulu Olduğu İçin Atlananlar:");
+                        foreach (var app in alreadyInstalledList)
+                        {
+                            sb.AppendLine($"• {app}");
+                        }
+                    }
+                    MessageBox.Show(sb.ToString(), "İşlem Tamamlandı (Hatalı/Eksik)", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("[+] Bütün ayarlar ve kurulumlar sorunsuz bir şekilde tamamlandı.");
+                    Console.ResetColor();
+
+                    string successMessage = "Bütün optimizasyon ayarları ve kurulumlar sorunsuz bir şekilde tamamlandı!";
+                    if (alreadyInstalledList.Count > 0)
+                    {
+                        successMessage += $"\n\nSistemde zaten kurulu olduğu için atlanan programlar:\n• {string.Join("\n• ", alreadyInstalledList)}";
+                    }
+
+                    MessageBox.Show(successMessage, "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Show custom premium success dialog
+                    var successForm = new NotificationForm();
+                    successForm.ShowDialog(this);
+                }
             }
             catch (Exception ex)
             {
@@ -425,10 +523,13 @@ namespace SpeedInstaller
                 btnStart.Enabled = true;
                 flowSoftwareList.Enabled = true;
                 pnlRightTweak.Enabled = true;
+                
+                // Refresh scan to update status checkboxes
+                ScanProgramlarDirectory();
             }
         }
 
-        private void RunProcess(string fileName, string arguments)
+        private bool RunProcess(string fileName, string arguments)
         {
             try
             {
@@ -441,14 +542,16 @@ namespace SpeedInstaller
                 };
                 Process? p = Process.Start(psi);
                 p?.WaitForExit();
+                return p == null || p.ExitCode == 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[-] İşlem başlatılamadı ({Path.GetFileName(fileName)}): {ex.Message}");
+                return false;
             }
         }
 
-        private void ApplyPerformanceSettings(bool keepFontSmoothing)
+        private bool ApplyPerformanceSettings(bool keepFontSmoothing)
         {
             try
             {
@@ -464,6 +567,7 @@ namespace SpeedInstaller
                 {
                     if (desktopKey != null)
                     {
+                        // Performance mask that turns off animations, transitions, and shadows
                         byte[] performanceMask = new byte[] { 0x90, 0x12, 0x01, 0x80, 0x10, 0x00, 0x00, 0x00 };
                         desktopKey.SetValue("UserPreferencesMask", performanceMask, RegistryValueKind.Binary);
                         
@@ -481,6 +585,14 @@ namespace SpeedInstaller
                     }
                 }
 
+                using (RegistryKey? minAnimKey = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop\WindowMetrics", true))
+                {
+                    if (minAnimKey != null)
+                    {
+                        minAnimKey.SetValue("MinAnimate", "0", RegistryValueKind.String);
+                    }
+                }
+
                 using (RegistryKey? advancedKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true))
                 {
                     if (advancedKey != null)
@@ -488,7 +600,27 @@ namespace SpeedInstaller
                         advancedKey.SetValue("TaskbarAnimations", 0, RegistryValueKind.DWord);
                         advancedKey.SetValue("ListviewAlphaSelect", 0, RegistryValueKind.DWord);
                         advancedKey.SetValue("ListviewShadow", 0, RegistryValueKind.DWord);
+                        advancedKey.SetValue("IconsOnly", 1, RegistryValueKind.DWord); // Disable thumbnails like in screenshot
                     }
+                }
+
+                string[] visualEffectsKeys = {
+                    "AnimateMinMax", "ComboBoxAnimation", "CursorShadow", "DragFullWindows", "DropShadow",
+                    "ListBoxAnimation", "ListviewAlphaSelect", "ListviewShadow", "MenuAnimation",
+                    "SelectionFade", "TaskbarAnimations", "TooltipAnimation", "WebTemplates"
+                };
+
+                foreach (var keyName in visualEffectsKeys)
+                {
+                    using (RegistryKey? key = Registry.CurrentUser.CreateSubKey($@"Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\{keyName}"))
+                    {
+                        key?.SetValue("AppliedValue", 0, RegistryValueKind.DWord);
+                    }
+                }
+
+                using (RegistryKey? key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\FontSmoothing"))
+                {
+                    key?.SetValue("AppliedValue", keepFontSmoothing ? 1 : 0, RegistryValueKind.DWord);
                 }
 
                 SystemParametersInfo(SPI_SETFONTSMOOTHING, keepFontSmoothing ? 1u : 0u, IntPtr.Zero, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
@@ -496,14 +628,59 @@ namespace SpeedInstaller
 
                 IntPtr result;
                 SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, IntPtr.Zero, "Registry", SMTO_ABORTIFHUNG, 5000, out result);
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[-] Görsel efekt optimizasyon hatası: {ex.Message}");
+                return false;
             }
         }
 
-        private void ApplyPowerSettings(bool disableSleep)
+        private bool ApplyAdvancedTweaks()
+        {
+            try
+            {
+                using (RegistryKey? sysProfileKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"))
+                {
+                    sysProfileKey?.SetValue("SystemResponsiveness", 0, RegistryValueKind.DWord);
+                }
+
+                using (RegistryKey? desktopKey = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true))
+                {
+                    if (desktopKey != null)
+                    {
+                        desktopKey.SetValue("MenuShowDelay", "0", RegistryValueKind.String);
+                        desktopKey.SetValue("AutoEndTasks", "1", RegistryValueKind.String);
+                        desktopKey.SetValue("HungAppTimeout", "1000", RegistryValueKind.String);
+                        desktopKey.SetValue("WaitToKillAppTimeout", "2000", RegistryValueKind.String);
+                    }
+                }
+
+                using (RegistryKey? gameDVRKey = Registry.CurrentUser.CreateSubKey(@"System\GameConfigStore"))
+                {
+                    gameDVRKey?.SetValue("GameDVR_Enabled", 0, RegistryValueKind.DWord);
+                }
+                using (RegistryKey? xboxDVRKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR"))
+                {
+                    xboxDVRKey?.SetValue("value", 0, RegistryValueKind.DWord);
+                }
+
+                using (RegistryKey? telemetryKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection"))
+                {
+                    telemetryKey?.SetValue("AllowTelemetry", 0, RegistryValueKind.DWord);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[-] Gelişmiş hızlandırma ayarları hatası: {ex.Message}");
+                return false;
+            }
+        }
+
+        private bool ApplyPowerSettings(bool disableSleep)
         {
             try
             {
@@ -511,15 +688,18 @@ namespace SpeedInstaller
 
                 if (disableSleep)
                 {
+                    RunPowercfg("-h off");
                     RunPowercfg("-change monitor-timeout-ac 0");
                     RunPowercfg("-change monitor-timeout-dc 0");
                     RunPowercfg("-change standby-timeout-ac 0");
                     RunPowercfg("-change standby-timeout-dc 0");
                 }
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[-] Güç ayarı hatası: {ex.Message}");
+                return false;
             }
         }
 
@@ -540,7 +720,7 @@ namespace SpeedInstaller
             catch {}
         }
 
-        private void UpgradePackagesUsingWinget()
+        private bool UpgradePackagesUsingWinget()
         {
             if (IsInternetAvailable())
             {
@@ -559,25 +739,26 @@ namespace SpeedInstaller
                     Process? p = Process.Start(psi);
                     if (p != null)
                     {
-                        // Read winget output lines and write them to our console redirection in real-time
                         while (!p.StandardOutput.EndOfStream)
                         {
                             string? line = p.StandardOutput.ReadLine();
                             if (line != null) Console.WriteLine($"   [Winget]: {line}");
                         }
                         p.WaitForExit();
+                        return p.ExitCode == 0;
                     }
-                    Console.WriteLine("[+] Winget güncelleştirmeleri denetlendi.");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"[-] Winget çalıştırma hatası: {ex.Message}");
+                    return false;
                 }
             }
             else
             {
                 Console.WriteLine("[-] İnternet bağlantısı yok. Güncelleme denetimi atlanıyor.");
             }
+            return true;
         }
 
         private bool IsInternetAvailable()
@@ -594,6 +775,102 @@ namespace SpeedInstaller
             {
                 return false;
             }
+        }
+
+        // Registry check logic to find installed apps
+        private HashSet<string> GetInstalledApps()
+        {
+            HashSet<string> installedApps = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            
+            string[] uninstallKeys = {
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+                @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+            };
+
+            foreach (var keyPath in uninstallKeys)
+            {
+                using (RegistryKey? key = Registry.LocalMachine.OpenSubKey(keyPath))
+                {
+                    if (key != null)
+                    {
+                        foreach (string subkeyName in key.GetSubKeyNames())
+                        {
+                            using (RegistryKey? subkey = key.OpenSubKey(subkeyName))
+                            {
+                                string? displayName = subkey?.GetValue("DisplayName") as string;
+                                if (!string.IsNullOrEmpty(displayName))
+                                {
+                                    installedApps.Add(displayName);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            using (RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
+            {
+                if (key != null)
+                {
+                    foreach (string subkeyName in key.GetSubKeyNames())
+                    {
+                        using (RegistryKey? subkey = key.OpenSubKey(subkeyName))
+                        {
+                            string? displayName = subkey?.GetValue("DisplayName") as string;
+                            if (!string.IsNullOrEmpty(displayName))
+                            {
+                                installedApps.Add(displayName);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return installedApps;
+        }
+
+        private bool IsProgramInstalled(string installerPath, HashSet<string> installedApps, out string matchedName)
+        {
+            matchedName = "";
+            try
+            {
+                FileVersionInfo info = FileVersionInfo.GetVersionInfo(installerPath);
+                string productName = info.ProductName ?? "";
+                string fileDescription = info.FileDescription ?? "";
+                string fileName = Path.GetFileNameWithoutExtension(installerPath);
+
+                foreach (string app in installedApps)
+                {
+                    if (!string.IsNullOrEmpty(productName) && app.Contains(productName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        matchedName = app;
+                        return true;
+                    }
+                    if (!string.IsNullOrEmpty(fileDescription) && app.Contains(fileDescription, StringComparison.OrdinalIgnoreCase))
+                    {
+                        matchedName = app;
+                        return true;
+                    }
+                    if (fileName.Contains("chrome", StringComparison.OrdinalIgnoreCase) && app.Contains("Chrome", StringComparison.OrdinalIgnoreCase))
+                    {
+                        matchedName = "Google Chrome";
+                        return true;
+                    }
+                    if ((fileName.Contains("adobe", StringComparison.OrdinalIgnoreCase) || fileName.Contains("reader", StringComparison.OrdinalIgnoreCase)) && 
+                        (app.Contains("Adobe Acrobat", StringComparison.OrdinalIgnoreCase) || app.Contains("Adobe Reader", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        matchedName = "Adobe Acrobat Reader";
+                        return true;
+                    }
+                    if (fileName.Contains("alpemix", StringComparison.OrdinalIgnoreCase) && app.Contains("Alpemix", StringComparison.OrdinalIgnoreCase))
+                    {
+                        matchedName = "Alpemix";
+                        return true;
+                    }
+                }
+            }
+            catch {}
+            return false;
         }
 
         // GUI paint methods for smooth visual design

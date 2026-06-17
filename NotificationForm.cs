@@ -14,7 +14,7 @@ namespace SpeedInstaller
         private Button btnOk;
         private Panel pnlHeader;
         
-        public NotificationForm()
+        public NotificationForm(string title = "BAŞARILI", string message = "İşlem Tamamlandı:\nProgramlar kuruldu ve sistem optimize edildi!")
         {
             this.FormBorderStyle = FormBorderStyle.None;
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -85,7 +85,7 @@ namespace SpeedInstaller
             // Title Label
             lblTitle = new Label
             {
-                Text = "BAŞARILI",
+                Text = title.ToUpper(),
                 Font = new Font("Segoe UI", 12F, FontStyle.Bold),
                 ForeColor = Color.FromArgb(0, 242, 254),
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -97,12 +97,12 @@ namespace SpeedInstaller
             // Message Label
             lblMessage = new Label
             {
-                Text = "İşlem Tamamlandı:\nProgramlar kuruldu ve sistem optimize edildi!",
-                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
+                Text = message,
+                Font = new Font("Segoe UI", 9.5F, FontStyle.Regular),
                 ForeColor = Color.FromArgb(200, 200, 210),
                 TextAlign = ContentAlignment.MiddleCenter,
-                Location = new Point(20, 135),
-                Size = new Size(this.Width - 40, 50),
+                Location = new Point(20, 130),
+                Size = new Size(this.Width - 40, 60),
                 BackColor = Color.Transparent
             };
 

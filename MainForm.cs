@@ -51,12 +51,25 @@ namespace SpeedInstaller
 
         private Panel pnlRightTweak;
         private Label lblRightTitle;
+        private FlowLayoutPanel flowTweakList;
+
+        // Custom Tweak Checkboxes
         private CheckBox chkVisualEffects;
         private CheckBox chkClearType;
+        private CheckBox chkMenuDelay;
+        private CheckBox chkResponsiveness;
+        private CheckBox chkAutoEndTasks;
+        private CheckBox chkGameDVR;
+        private CheckBox chkTelemetry;
+        private CheckBox chkHibernation;
         private CheckBox chkPowerPlan;
         private CheckBox chkSleepTimeout;
-        private CheckBox chkAdvancedTweaks;
         private CheckBox chkWingetUpgrade;
+        private CheckBox chkSysMain;
+        private CheckBox chkWindowsSearch;
+        private CheckBox chkGpuScheduling;
+        private CheckBox chkNetworkTweak;
+        private CheckBox chkLargeSystemCache;
 
         private RichTextBox rchLogs;
         private ProgressBar prgProgress;
@@ -191,7 +204,7 @@ namespace SpeedInstaller
             pnlLeftSoftware.Controls.Add(lblLeftTitle);
             pnlLeftSoftware.Controls.Add(flowSoftwareList);
 
-            // Right Card: Windows Performance Tweaks
+            // Right Card: Windows Performance Tweaks (Scrolled List)
             pnlRightTweak = new Panel
             {
                 Size = new Size(370, 260),
@@ -209,20 +222,52 @@ namespace SpeedInstaller
                 Size = new Size(340, 25)
             };
 
-            chkVisualEffects = CreateStyledCheckBox("Görsel Efektleri Kapat (Sadece ClearType)", 50, true);
-            chkClearType = CreateStyledCheckBox("ClearType Yazı Düzeltmeyi Açık Bırak", 80, true);
-            chkPowerPlan = CreateStyledCheckBox("Yüksek Performans Güç Planı + SSD Ayarı", 110, true);
-            chkSleepTimeout = CreateStyledCheckBox("Ekran Kapatma ve Uykuyu Devre Dışı Bırak", 140, true);
-            chkAdvancedTweaks = CreateStyledCheckBox("Gelişmiş Hızlandırma Ayarları (Menu/CPU/RAM)", 170, true);
-            chkWingetUpgrade = CreateStyledCheckBox("Winget ile Otomatik Paketleri Güncelle", 200, true);
+            flowTweakList = new FlowLayoutPanel
+            {
+                Location = new Point(15, 45),
+                Size = new Size(340, 200),
+                AutoScroll = true,
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false
+            };
+
+            // Build Tweak Checkboxes
+            chkVisualEffects = CreateTweakCheckBox("Görsel Efektleri Kapat (Performans)");
+            chkClearType = CreateTweakCheckBox("ClearType Kenar Düzeltmeyi Açık Bırak");
+            chkMenuDelay = CreateTweakCheckBox("Menü Açılış Gecikmesini Sıfırla (0 ms)");
+            chkResponsiveness = CreateTweakCheckBox("Sistem Tepkiselliğini İyileştir (Low Latency)");
+            chkAutoEndTasks = CreateTweakCheckBox("Kilitlenen Programları Otomatik Sonlandır");
+            chkGameDVR = CreateTweakCheckBox("Xbox Game DVR (Arka Plan Kaydı) Kapat");
+            chkTelemetry = CreateTweakCheckBox("Windows Telemetri Veri Gönderimini Kapat");
+            chkHibernation = CreateTweakCheckBox("Hazırda Bekletmeyi Kapat (SSD Boş Alan)");
+            chkPowerPlan = CreateTweakCheckBox("Yüksek Performans Güç Planını Etkinleştir");
+            chkSleepTimeout = CreateTweakCheckBox("Ekran Kapatma ve Uykuyu ASLA Yap");
+            chkSysMain = CreateTweakCheckBox("SysMain (Superfetch) RAM Tasarrufu Hizmetini Kapat");
+            chkWindowsSearch = CreateTweakCheckBox("Windows Search Dizin Oluşturucuyu Kapat");
+            chkGpuScheduling = CreateTweakCheckBox("GPU Donanım Hızlandırmayı (HAGS) Etkinleştir");
+            chkNetworkTweak = CreateTweakCheckBox("Ağ Bant Genişliği Limitini Kaldır (%20 Limit)");
+            chkLargeSystemCache = CreateTweakCheckBox("Büyük Sistem Önnbelleğini Etkinleştir");
+            chkWingetUpgrade = CreateTweakCheckBox("Winget ile Otomatik Paketleri Güncelle");
+
+            flowTweakList.Controls.Add(chkVisualEffects);
+            flowTweakList.Controls.Add(chkClearType);
+            flowTweakList.Controls.Add(chkMenuDelay);
+            flowTweakList.Controls.Add(chkResponsiveness);
+            flowTweakList.Controls.Add(chkAutoEndTasks);
+            flowTweakList.Controls.Add(chkGameDVR);
+            flowTweakList.Controls.Add(chkTelemetry);
+            flowTweakList.Controls.Add(chkHibernation);
+            flowTweakList.Controls.Add(chkPowerPlan);
+            flowTweakList.Controls.Add(chkSleepTimeout);
+            flowTweakList.Controls.Add(chkSysMain);
+            flowTweakList.Controls.Add(chkWindowsSearch);
+            flowTweakList.Controls.Add(chkGpuScheduling);
+            flowTweakList.Controls.Add(chkNetworkTweak);
+            flowTweakList.Controls.Add(chkLargeSystemCache);
+            flowTweakList.Controls.Add(chkWingetUpgrade);
 
             pnlRightTweak.Controls.Add(lblRightTitle);
-            pnlRightTweak.Controls.Add(chkVisualEffects);
-            pnlRightTweak.Controls.Add(chkClearType);
-            pnlRightTweak.Controls.Add(chkPowerPlan);
-            pnlRightTweak.Controls.Add(chkSleepTimeout);
-            pnlRightTweak.Controls.Add(chkAdvancedTweaks);
-            pnlRightTweak.Controls.Add(chkWingetUpgrade);
+            pnlRightTweak.Controls.Add(flowTweakList);
 
             // Logging Terminal
             rchLogs = new RichTextBox
@@ -272,16 +317,16 @@ namespace SpeedInstaller
             this.Paint += MainWindow_Paint;
         }
 
-        private CheckBox CreateStyledCheckBox(string text, int top, bool Checked)
+        private CheckBox CreateTweakCheckBox(string text)
         {
             return new CheckBox
             {
                 Text = text,
                 Font = new Font("Segoe UI", 9.5F),
                 ForeColor = Color.FromArgb(200, 200, 210),
-                Location = new Point(20, top),
-                Size = new Size(330, 25),
-                Checked = Checked,
+                AutoSize = true,
+                Margin = new Padding(5, 4, 5, 4),
+                Checked = true,
                 FlatStyle = FlatStyle.Flat
             };
         }
@@ -311,7 +356,6 @@ namespace SpeedInstaller
                         {
                             string fileName = Path.GetFileName(file);
                             
-                            // Check if program is already installed on system
                             string matchedName = "";
                             bool isInstalled = IsProgramInstalled(file, installedApps, out matchedName);
 
@@ -325,9 +369,9 @@ namespace SpeedInstaller
                                 ForeColor = labelColor,
                                 AutoSize = true,
                                 Margin = new Padding(5, 5, 5, 5),
-                                Checked = !isInstalled, // Default unchecked if already installed
+                                Checked = !isInstalled,
                                 FlatStyle = FlatStyle.Flat,
-                                Tag = new KeyValuePair<string, bool>(file, isInstalled) // Store path and install status
+                                Tag = new KeyValuePair<string, bool>(file, isInstalled)
                             };
                             flowSoftwareList.Controls.Add(chk);
                             dynamicProgramCheckBoxes.Add(chk);
@@ -367,7 +411,6 @@ namespace SpeedInstaller
                     }
                     else if (pair.Value)
                     {
-                        // Was unchecked because it was already installed
                         alreadyInstalledList.Add(Path.GetFileName(pair.Key));
                     }
                 }
@@ -375,8 +418,10 @@ namespace SpeedInstaller
 
             int totalSteps = 0;
             if (chkVisualEffects.Checked) totalSteps++;
-            if (chkAdvancedTweaks.Checked) totalSteps++;
+            if (chkMenuDelay.Checked || chkResponsiveness.Checked || chkAutoEndTasks.Checked || chkGameDVR.Checked || chkTelemetry.Checked) totalSteps++;
+            if (chkSysMain.Checked || chkWindowsSearch.Checked || chkGpuScheduling.Checked || chkNetworkTweak.Checked || chkLargeSystemCache.Checked) totalSteps++;
             if (chkPowerPlan.Checked) totalSteps++;
+            if (chkHibernation.Checked) totalSteps++;
             totalSteps += selectedInstallers.Count;
             if (chkWingetUpgrade.Checked) totalSteps++;
 
@@ -402,23 +447,41 @@ namespace SpeedInstaller
                     incrementProgress();
                 }
 
-                if (chkAdvancedTweaks.Checked)
+                // Registry tweaks split by checkboxes
+                if (chkMenuDelay.Checked || chkResponsiveness.Checked || chkAutoEndTasks.Checked || chkGameDVR.Checked || chkTelemetry.Checked)
                 {
-                    Console.WriteLine("[*] Gelişmiş Hızlandırma Ayarları Uygulanıyor (Menu/CPU/AutoEndTasks)...");
-                    bool ok = await Task.Run(() => ApplyAdvancedTweaks());
-                    if (!ok) failedOperations.Add("Gelişmiş Performans Kayıt Defteri Ayarları");
+                    Console.WriteLine("[*] Seçilen Performans Kayıt Defteri Ayarları Uygulanıyor...");
+                    bool ok = await Task.Run(() => ApplySelectedRegistryTweaks());
+                    if (!ok) failedOperations.Add("Gelişmiş Kayıt Defteri Optimizasyonu");
+                    incrementProgress();
+                }
+
+                // Extra performance tweaks
+                if (chkSysMain.Checked || chkWindowsSearch.Checked || chkGpuScheduling.Checked || chkNetworkTweak.Checked || chkLargeSystemCache.Checked)
+                {
+                    Console.WriteLine("[*] Ek Performans ve Sistem Servis Ayarları Uygulanıyor...");
+                    bool ok = await Task.Run(() => ApplyExtraPerformanceTweaks());
+                    if (!ok) failedOperations.Add("Ek Performans Optimizasyonları");
                     incrementProgress();
                 }
 
                 if (chkPowerPlan.Checked)
                 {
-                    Console.WriteLine("[*] Güç Yönetimi ve SSD Alan Tasarrufu Yapılandırılıyor...");
+                    Console.WriteLine("[*] Güç Yönetimi Yapılandırılıyor...");
                     bool ok = await Task.Run(() => ApplyPowerSettings(chkSleepTimeout.Checked));
                     if (!ok) failedOperations.Add("Yüksek Performans Güç Şeması");
                     incrementProgress();
                 }
 
-                Console.WriteLine("[+] Performans ve Sistem optimizasyon ayarları başarıyla tamamlandı.");
+                if (chkHibernation.Checked)
+                {
+                    Console.WriteLine("[*] Hazırda Bekletme Modu (Hibernasyon) Kapatılıyor...");
+                    bool ok = await Task.Run(() => DisableHibernation());
+                    if (!ok) failedOperations.Add("Hazırda Bekletmeyi Kapatma");
+                    incrementProgress();
+                }
+
+                Console.WriteLine("[+] Performans ve Sistem optimizasyon ayarları tamamlandı.");
                 MessageBox.Show("Görsel ve performans ayarları başarıyla tamamlandı.\n\nŞimdi program kurulumlarına geçiliyor...", "Aşama 1 Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 // PHASE 2: PROGRAM INSTALLATIONS
@@ -449,6 +512,13 @@ namespace SpeedInstaller
                     
                     bool ok = await Task.Run(() => UpgradePackagesUsingWinget());
                     if (!ok) failedOperations.Add("Winget Paket Güncelleme");
+                    
+                    Console.WriteLine("[+] Winget paket güncelleştirmeleri tamamlandı.");
+                    
+                    // Specific premium notification for Winget updates completion
+                    var wingetNotification = new NotificationForm("GÜNCELLEME TAMAMLANDI", "Winget ile sistemdeki paketlerin güncellenmesi tamamlandı!");
+                    wingetNotification.ShowDialog(this);
+                    
                     incrementProgress();
                 }
 
@@ -510,7 +580,12 @@ namespace SpeedInstaller
                     MessageBox.Show(successMessage, "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                     // Show custom premium success dialog
-                    var successForm = new NotificationForm();
+                    string finalNotificationMsg = "İşlem Tamamlandı:\nProgramlar kuruldu ve sistem optimize edildi!";
+                    if (chkWingetUpgrade.Checked)
+                    {
+                        finalNotificationMsg = "İşlem Tamamlandı:\nProgramlar kuruldu, sistem optimize edildi ve güncelleştirmeler uygulandı!";
+                    }
+                    var successForm = new NotificationForm("BAŞARILI", finalNotificationMsg);
                     successForm.ShowDialog(this);
                 }
             }
@@ -600,7 +675,7 @@ namespace SpeedInstaller
                         advancedKey.SetValue("TaskbarAnimations", 0, RegistryValueKind.DWord);
                         advancedKey.SetValue("ListviewAlphaSelect", 0, RegistryValueKind.DWord);
                         advancedKey.SetValue("ListviewShadow", 0, RegistryValueKind.DWord);
-                        advancedKey.SetValue("IconsOnly", 1, RegistryValueKind.DWord); // Disable thumbnails like in screenshot
+                        advancedKey.SetValue("IconsOnly", 1, RegistryValueKind.DWord);
                     }
                 }
 
@@ -637,45 +712,169 @@ namespace SpeedInstaller
             }
         }
 
-        private bool ApplyAdvancedTweaks()
+        private bool ApplySelectedRegistryTweaks()
         {
             try
             {
-                using (RegistryKey? sysProfileKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"))
+                // 1. Menu Delay
+                if (chkMenuDelay.Checked)
                 {
-                    sysProfileKey?.SetValue("SystemResponsiveness", 0, RegistryValueKind.DWord);
-                }
-
-                using (RegistryKey? desktopKey = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true))
-                {
-                    if (desktopKey != null)
+                    using (RegistryKey? desktopKey = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true))
                     {
-                        desktopKey.SetValue("MenuShowDelay", "0", RegistryValueKind.String);
-                        desktopKey.SetValue("AutoEndTasks", "1", RegistryValueKind.String);
-                        desktopKey.SetValue("HungAppTimeout", "1000", RegistryValueKind.String);
-                        desktopKey.SetValue("WaitToKillAppTimeout", "2000", RegistryValueKind.String);
+                        desktopKey?.SetValue("MenuShowDelay", "0", RegistryValueKind.String);
                     }
+                    Console.WriteLine("[+] Menü açılış gecikmesi sıfırlandı.");
                 }
 
-                using (RegistryKey? gameDVRKey = Registry.CurrentUser.CreateSubKey(@"System\GameConfigStore"))
+                // 2. System Responsiveness
+                if (chkResponsiveness.Checked)
                 {
-                    gameDVRKey?.SetValue("GameDVR_Enabled", 0, RegistryValueKind.DWord);
-                }
-                using (RegistryKey? xboxDVRKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR"))
-                {
-                    xboxDVRKey?.SetValue("value", 0, RegistryValueKind.DWord);
+                    using (RegistryKey? sysProfileKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"))
+                    {
+                        sysProfileKey?.SetValue("SystemResponsiveness", 0, RegistryValueKind.DWord);
+                    }
+                    Console.WriteLine("[+] Sistem yanıt önceliği optimize edildi (Low Latency).");
                 }
 
-                using (RegistryKey? telemetryKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection"))
+                // 3. Auto End Tasks
+                if (chkAutoEndTasks.Checked)
                 {
-                    telemetryKey?.SetValue("AllowTelemetry", 0, RegistryValueKind.DWord);
+                    using (RegistryKey? desktopKey = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true))
+                    {
+                        if (desktopKey != null)
+                        {
+                            desktopKey.SetValue("AutoEndTasks", "1", RegistryValueKind.String);
+                            desktopKey.SetValue("HungAppTimeout", "1000", RegistryValueKind.String);
+                            desktopKey.SetValue("WaitToKillAppTimeout", "2000", RegistryValueKind.String);
+                        }
+                    }
+                    Console.WriteLine("[+] Kilitlenen uygulamaları otomatik kapatma etkinleştirildi.");
+                }
+
+                // 4. Game DVR
+                if (chkGameDVR.Checked)
+                {
+                    using (RegistryKey? gameDVRKey = Registry.CurrentUser.CreateSubKey(@"System\GameConfigStore"))
+                    {
+                        gameDVRKey?.SetValue("GameDVR_Enabled", 0, RegistryValueKind.DWord);
+                    }
+                    using (RegistryKey? xboxDVRKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR"))
+                    {
+                        xboxDVRKey?.SetValue("value", 0, RegistryValueKind.DWord);
+                    }
+                    Console.WriteLine("[+] Xbox Game DVR (Arka plan ekran kaydı) kapatıldı.");
+                }
+
+                // 5. Telemetry
+                if (chkTelemetry.Checked)
+                {
+                    using (RegistryKey? telemetryKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection"))
+                    {
+                        telemetryKey?.SetValue("AllowTelemetry", 0, RegistryValueKind.DWord);
+                    }
+                    Console.WriteLine("[+] Windows arka plan telemetri gönderimi kapatıldı.");
                 }
 
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[-] Gelişmiş hızlandırma ayarları hatası: {ex.Message}");
+                Console.WriteLine($"[-] Kayıt defteri ince optimizasyon hatası: {ex.Message}");
+                return false;
+            }
+        }
+
+        private bool DisableHibernation()
+        {
+            try
+            {
+                RunPowercfg("-h off");
+                Console.WriteLine("[+] Hazırda bekletme (Hibernasyon) kapatıldı ve diskte alan açıldı.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[-] Hazırda bekletmeyi kapatma hatası: {ex.Message}");
+                return false;
+            }
+        }
+
+        private bool ApplyExtraPerformanceTweaks()
+        {
+            try
+            {
+                // 1. SysMain Service
+                if (chkSysMain.Checked)
+                {
+                    RunProcessHidden("sc.exe", "config SysMain start= disabled");
+                    RunProcessHidden("sc.exe", "stop SysMain");
+                    Console.WriteLine("[+] SysMain (Superfetch) servisi durduruldu ve devre dışı bırakıldı.");
+                }
+
+                // 2. Windows Search Service
+                if (chkWindowsSearch.Checked)
+                {
+                    RunProcessHidden("sc.exe", "config WSearch start= disabled");
+                    RunProcessHidden("sc.exe", "stop WSearch");
+                    Console.WriteLine("[+] Windows Search servisi durduruldu ve devre dışı bırakıldı.");
+                }
+
+                // 3. GPU Scheduling (HAGS)
+                if (chkGpuScheduling.Checked)
+                {
+                    using (RegistryKey? key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\GraphicsDrivers"))
+                    {
+                        key?.SetValue("HwSchMode", 2, RegistryValueKind.DWord);
+                    }
+                    Console.WriteLine("[+] Donanım Hızlandırmalı GPU Zamanlaması (HAGS) kayıt defterinde etkinleştirildi.");
+                }
+
+                // 4. QoS Bandwidth Limit
+                if (chkNetworkTweak.Checked)
+                {
+                    using (RegistryKey? key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\Psched"))
+                    {
+                        key?.SetValue("NonBestEffortLimit", 0, RegistryValueKind.DWord);
+                    }
+                    Console.WriteLine("[+] Ağ Bant Genişliği Limit Rezervi kaldırıldı (%0).");
+                }
+
+                // 5. Large System Cache
+                if (chkLargeSystemCache.Checked)
+                {
+                    using (RegistryKey? key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management"))
+                    {
+                        key?.SetValue("LargeSystemCache", 1, RegistryValueKind.DWord);
+                    }
+                    Console.WriteLine("[+] Büyük Sistem Önnbelleği (Large System Cache) etkinleştirildi.");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[-] Ek performans optimizasyon hatası: {ex.Message}");
+                return false;
+            }
+        }
+
+        private bool RunProcessHidden(string fileName, string arguments)
+        {
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = fileName,
+                    Arguments = arguments,
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                Process? p = Process.Start(psi);
+                p?.WaitForExit();
+                return p == null || p.ExitCode == 0;
+            }
+            catch
+            {
                 return false;
             }
         }
@@ -688,7 +887,6 @@ namespace SpeedInstaller
 
                 if (disableSleep)
                 {
-                    RunPowercfg("-h off");
                     RunPowercfg("-change monitor-timeout-ac 0");
                     RunPowercfg("-change monitor-timeout-dc 0");
                     RunPowercfg("-change standby-timeout-ac 0");
@@ -777,7 +975,6 @@ namespace SpeedInstaller
             }
         }
 
-        // Registry check logic to find installed apps
         private HashSet<string> GetInstalledApps()
         {
             HashSet<string> installedApps = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -873,7 +1070,6 @@ namespace SpeedInstaller
             return false;
         }
 
-        // GUI paint methods for smooth visual design
         private void MainWindow_Paint(object? sender, PaintEventArgs e)
         {
             using (Pen pen = new Pen(Color.FromArgb(30, 30, 40), 1))
@@ -895,7 +1091,6 @@ namespace SpeedInstaller
         }
     }
 
-    // Helper class to redirect Console.Out to our RichTextBox control
     public class ControlWriter : TextWriter
     {
         private readonly RichTextBox textbox;
